@@ -201,14 +201,16 @@ class Music(commands.Cog):
 async def setup(bot):
     await bot.add_cog(Music(bot))
 
+
 def main():
-    bot = MusicBot()
-    
-    if __name__ == "__main__":
     bot = MusicBot()
 
     @bot.event
     async def setup_hook():
-    await bot.load_extension('main')  # if main.py is extension, or skip if not
+        await bot.load_extension('main')  # Only if you're using cogs/main.py
 
-bot.run(TOKEN)
+    bot.run(os.environ["TOKEN"])
+
+# Entry point
+if __name__ == "__main__":
+    main()
