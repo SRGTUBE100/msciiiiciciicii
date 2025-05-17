@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  lavalink:
+    build:
+      context: .
+      target: lavalink
+    ports:
+      - "2333:2333"
+    volumes:
+      - ./logs:/opt/Lavalink/logs
+    networks:
+      - bot-network
+
+  bot:
+    build: .
+    depends_on:
+      - lavalink
+    environment:
+      - LAVALINK_HOST=lavalink
+    networks:
+      - bot-network
+
+networks:
+  bot-network:
+    driver: bridge 
