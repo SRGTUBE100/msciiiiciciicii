@@ -1,3 +1,4 @@
+import os
 import discord
 from discord.ext import commands
 import wavelink
@@ -5,10 +6,15 @@ import datetime
 import asyncio
 from typing import Optional
 import re
-import config
 
-# Custom color for embeds
-EMBED_COLOR = discord.Color.purple()
+# Fetch secrets
+TOKEN = os.environ.get("TOKEN")
+LAVALINK_HOST = os.environ.get("LAVALINK_HOST")
+LAVALINK_PORT = int(os.environ.get("LAVALINK_PORT", 2333))  # fallback in case it's unset
+LAVALINK_PASSWORD = os.environ.get("LAVALINK_PASSWORD")
+LAVALINK_REGION = os.environ.get("LAVALINK_REGION", "us_central")
+
+# Continue with your existing code...
 
 class MusicBot(commands.Bot):
     def __init__(self):
@@ -18,13 +24,15 @@ class MusicBot(commands.Bot):
             help_command=None
         )
         self.add_listener(self.on_wavelink_node_ready, 'on_wavelink_node_ready')
-        
+
     async def setup_hook(self):
         node: wavelink.Node = wavelink.Node(
-            uri='http://localhost:2333',
-            password='youshallnotpass'
+            uri=f"http://{LAVALINK_HOST}:{LAVALINK_PORT}",
+            password=LAVALINK_PASSWORD,
+            region=LAVALINK_REGION
         )
         await wavelink.NodePool.connect(client=self, nodes=[node])
+
 
     async def on_wavelink_node_ready(self, node: wavelink.Node):
         print(f'Node {node.identifier} is ready!')
@@ -196,11 +204,11 @@ async def setup(bot):
 def main():
     bot = MusicBot()
     
+    if __name__ == "__main__":
+    bot = MusicBot()
+
     @bot.event
     async def setup_hook():
-        await bot.load_extension('main')
-        
-    bot.run(config.TOKEN)
+    await bot.load_extension('main')  # if main.py is extension, or skip if not
 
-if __name__ == "__main__":
-    main() 
+bot.run(TOKEN)
