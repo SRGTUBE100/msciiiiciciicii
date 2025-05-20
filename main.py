@@ -12,8 +12,6 @@ TOKEN = os.environ.get("TOKEN")
 LAVALINK_HOST = os.environ.get("LAVALINK_HOST")
 LAVALINK_PORT = int(os.environ.get("LAVALINK_PORT", 2333))
 LAVALINK_PASSWORD = os.environ.get("LAVALINK_PASSWORD")
-LAVALINK_REGION = os.environ.get("LAVALINK_REGION", "us_central")
-
 EMBED_COLOR = 0x1DB954  # Spotify green-ish color
 
 class MusicBot(commands.Bot):
@@ -23,25 +21,21 @@ class MusicBot(commands.Bot):
             intents=discord.Intents.all(),
             help_command=None
         )
-        self.add_listener(self.on_wavelink_node_ready, 'on_wavelink_node_ready')
 
-async def setup_hook(self):
-    await super().setup_hook()
-    node = wavelink.Node(  # ❌ 'region' removed
-        uri=f"http://{LAVALINK_HOST}:{LAVALINK_PORT}",
-        password=LAVALINK_PASSWORD
-    )
-    await wavelink.NodePool.connect(client=self, nodes=[node])
-    await self.load_extension("main")  # Ensure 'main.py' is the filename
-
-
-    async def on_wavelink_node_ready(self, node: wavelink.Node):
-        print(f'Node {node.identifier} is ready!')
+    async def setup_hook(self):
+        node = wavelink.Node(
+            uri=f"http://{LAVALINK_HOST}:{LAVALINK_PORT}",
+            password=LAVALINK_PASSWORD
+        )
+        await wavelink.NodePool.connect(client=self, nodes=[node])
+        await self.load_extension("main")
 
     async def on_ready(self):
         print(f'Bot is ready! Logged in as {self.user}')
         await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="&help"))
 
+    async def on_wavelink_node_ready(self, node: wavelink.Node):
+        print(f'Node {node.identifier} is ready!')
 
 class Music(commands.Cog):
     def __init__(self, bot):
@@ -75,7 +69,7 @@ class Music(commands.Cog):
         if not re.match(r'http[s]?://', query):
             query = f'ytsearch:{query}'
 
-        tracks = await wavelink.NodePool.get_node().get_tracks(query=query)
+        tracks = await wavelink.NodePool.get_node().get_tracks(query)
 
         if not tracks:
             return await ctx.send(embed=discord.Embed(description="❌ No songs were found!", color=EMBED_COLOR))
