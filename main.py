@@ -25,15 +25,15 @@ class MusicBot(commands.Bot):
         )
         self.add_listener(self.on_wavelink_node_ready, 'on_wavelink_node_ready')
 
-    async def setup_hook(self):
-        await super().setup_hook()
-        node = wavelink.Node(
-            uri=f"http://{LAVALINK_HOST}:{LAVALINK_PORT}",
-            password=LAVALINK_PASSWORD,
-            region=LAVALINK_REGION
-        )
-        await wavelink.NodePool.connect(client=self, nodes=[node])
-        await self.load_extension("main")  # Ensure 'main.py' is the filename
+async def setup_hook(self):
+    await super().setup_hook()
+    node = wavelink.Node(  # ❌ 'region' removed
+        uri=f"http://{LAVALINK_HOST}:{LAVALINK_PORT}",
+        password=LAVALINK_PASSWORD
+    )
+    await wavelink.NodePool.connect(client=self, nodes=[node])
+    await self.load_extension("main")  # Ensure 'main.py' is the filename
+
 
     async def on_wavelink_node_ready(self, node: wavelink.Node):
         print(f'Node {node.identifier} is ready!')
