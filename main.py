@@ -7,11 +7,10 @@ import asyncio
 from typing import Optional
 import re
 
-# Fetch secrets from environment
 TOKEN = os.environ.get("TOKEN")
-LAVALINK_HOST = os.environ.get("LAVALINK_HOST")
+LAVALINK_HOST = os.environ.get("LAVALINK_HOST", "localhost")
 LAVALINK_PORT = int(os.environ.get("LAVALINK_PORT", 2333))
-LAVALINK_PASSWORD = os.environ.get("LAVALINK_PASSWORD")
+LAVALINK_PASSWORD = os.environ.get("LAVALINK_PASSWORD", "youshallnotpass")
 EMBED_COLOR = 0x1DB954  # Spotify green-ish color
 
 class MusicBot(commands.Bot):
