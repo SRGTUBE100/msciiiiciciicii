@@ -8,13 +8,20 @@ RUN apt-get update && \
 
 COPY application.yml application.yml
 
+
 FROM python:3.11-slim
 
 WORKDIR /app
 
+# Copy Lavalink from builder stage
+COPY --from=lavalink /opt/Lavalink /opt/Lavalink
+
+# Install python requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["python", "main.py"] 
+# Run Lavalink in background and then your bot
+CMD java -jar /opt/Lavalink/Lavalink.jar & \
+    python main.py
